@@ -44,7 +44,7 @@ class App {
             let festival = this.festivals.find(fs => fs.sn == id);
 
             // 데이터 변경
-            this.viewModal.querySelector(".image > img").src = festival.images.length > 0 ? `/resources/xml/festivalImages/${this.getFestivalId(festival)}/${festival.images[0]}` : `/images/no-image.png`;
+            this.viewModal.querySelector(".image > img").src = festival.images.length > 0 ? `/festivalImages/${this.getFestivalId(festival)}/${festival.images[0]}` : `/images/no-image.png`;
             this.viewModal.querySelector(".nm").innerHTML = festival.nm;
             this.viewModal.querySelector(".cn").innerHTML = festival.cn;
             this.viewModal.querySelector(".area").innerHTML = festival.area;
@@ -58,7 +58,7 @@ class App {
             if(festival.images.length > 0){
                 festival.images.forEach((filename, i) => {
                     this.viewModal.slideControl.innerHTML += `<button class="slide__no" data-no="${i}"><i class="fa fa-circle"></i></button>`;
-                    this.viewModal.slideImage.innerHTML += `<img src="/resources/xml/festivalImages/${this.getFestivalId(festival)}/${filename}" title="축제 정보 이미지" alt="축제 정보 이미지">`;
+                    this.viewModal.slideImage.innerHTML += `<img src="/festivalImages/${this.getFestivalId(festival)}/${filename}" title="축제 정보 이미지" alt="축제 정보 이미지">`;
                 });
             }
             else {
@@ -162,7 +162,7 @@ class App {
                                     <div class="image">
                                         ${
                                             last.images.length > 0 ?
-                                            `<img src="http://localhost/resources/xml/festivalImages/${this.getFestivalId(last)}/${last.images[0]}" title="축제 정보 이미지" alt="축제 정보 이미지">`
+                                            `<img src="http://localhost/festivalImages/${this.getFestivalId(last)}/${last.images[0]}" title="축제 정보 이미지" alt="축제 정보 이미지">`
                                             : `<div class="no-image"></div>`
                                         }
                                     </div>
@@ -194,7 +194,7 @@ class App {
                                 <div class="image">${
                                         fs.images.length == 0 ? `<div class="no-image"></div>` :
                                         `<div class="no">${fs.images.length}</div>
-                                        <img class="fit-cover" src="http://localhost/resources/xml/festivalImages/${this.getFestivalId(fs)}/${fs.images[0]}" title="축제 정보 이미지" alt="축제 정보 이미지">`
+                                        <img class="fit-cover" src="http://localhost/festivalImages/${this.getFestivalId(fs)}/${fs.images[0]}" title="축제 정보 이미지" alt="축제 정보 이미지">`
                                     }</div>
                                 <div class="px-3 py-3">
                                     <div class="font-weight-bold fx-2 mb-1">${fs.nm}</div>
@@ -226,26 +226,16 @@ class App {
                 this.festivals = JSON.parse(ls__festivals);
                 resolve();
             } else {
-                fetch("/resources/xml/festivalList.xml")
-                .then(res => res.text())
-                .then(async textData => {
-                    let parser = new DOMParser();
-                    let xmlDoc = parser.parseFromString(textData, "text/xml");
-                    let xmlItems = Array.from(xmlDoc.querySelectorAll("item"));
+                fetch("/api/festivals")
+                .then(res => res.json())
+                .then(async jsonData => {
+                    let festivals = jsonData.festivals;
                     let items = [];
-                    await Promise.all(xmlItems.map(async xmlItem => {
-                        let item = {};
-                        item.sn = xmlItem.querySelector("sn").innerHTML;
-                        item.no = xmlItem.querySelector("no").innerHTML;
-                        item.nm = xmlItem.querySelector("nm").innerHTML;
-                        item.area = xmlItem.querySelector("area").innerHTML;
-                        item.location = xmlItem.querySelector("location").innerHTML;
-                        item.cn = xmlItem.querySelector("cn").innerHTML;
-                        item.dt = xmlItem.querySelector("dt").innerHTML;
-                        item.images = (await Promise.all(Array.from(xmlItem.querySelectorAll("image")).map(xmlImage => new Promise(res => {
-                            let filename = xmlImage.innerHTML;
+                    await Promise.all(festivals.map(async jsonItem => {
+                        let item = jsonItem;
+                        item.images = (await Promise.all(JSON.parse(item.images).map(filename => new Promise(res => {
                             let xhr = new XMLHttpRequest();
-                            xhr.open("GET", `/resources/xml/festivalImages/${this.getFestivalId(item)}/${filename}`);
+                            xhr.open("GET", `/festivalImages/${this.getFestivalId(item)}/${filename}`);
                             xhr.onload = () => {
                                 if(xhr.status == 200 || xhr.status == 201) res(filename);
                                 else res(null);

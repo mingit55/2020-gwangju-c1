@@ -57,11 +57,11 @@
                     <div class="menu__item"><a href="/major-festival">전북 대표 축제</a></div>
                     <div class="menu__item"><a href="#">축제 정보</a></div>
                     <div class="menu__item"><a href="#">축제 일정</a></div>
-                    <div class="menu__item"><a href="/resources/exchange-guide.html">환율안내</a></div>
+                    <div class="menu__item"><a href="/exchange-guide">환율안내</a></div>
                     <div class="menu__item">
                         <a href="#">종합지원센터</a>
                         <div class="menu__list">
-                            <a href="/resources/sub.html">공지사항</a>
+                            <a href="/notice">공지사항</a>
                             <a href="#">센터 소개</a>
                             <a href="#">관광정보 문의</a>
                             <a href="#">공공 데이터 개방</a>
@@ -106,10 +106,10 @@
             <a href="/major-festival">전북 대표 축제</a>
             <a href="#">축제 정보</a>
             <a href="#">축제 일정</a>
-            <a href="/resources/exchange-guide.html">환율안내</a>
+            <a href="/exchange-guide">환율안내</a>
             <a href="#">종합지원센터</a>
             <div class="aside__subnav">
-                <a href="/resources/sub.html">공지사항</a>
+                <a href="/notice">공지사항</a>
                 <a href="#">센터 소개</a>
                 <a href="#">관광정보 문의</a>
                 <a href="#">공공 데이터 개방</a>
