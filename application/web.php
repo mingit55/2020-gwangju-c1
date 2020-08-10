@@ -11,6 +11,7 @@ Router::get("/major-festival", "MainController@majorFestivalPage");
  */
 
 Router::get("/api/festivals", "APIController@getFestivals");
+Router::get("/api/exchanges", "APIController@getExchanges");
 
 Router::get("/xml/insert-database", "APIController@insertDatabaseXML");
 

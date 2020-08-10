@@ -20,7 +20,7 @@
     <div class="text-right">
         <div class="d-inline-block py-1 px-3 mb-3 bg-red text-white rounded-pill">
             <span class="mr-2 fx-n2 text-white-muted">기준일</span>
-            <span>2020년 5일 5일</span>
+            <span class="updated-at">2020년 5일 5일</span>
         </div>
     </div>
     <!-- /최근 업데이트 -->
