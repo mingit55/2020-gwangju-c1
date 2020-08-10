@@ -26,4 +26,8 @@ class DB {
     static function fetchAll($sql, $data = []){
         return self::query($sql, $data)->fetchAll();
     }
+
+    static function lastInsertId(){
+        return self::getConnection()->lastInsertId();
+    }
 }

@@ -7,8 +7,8 @@ function dump(){
     }
 }
 
-function user(){
-    return isset($_SESSION['user']) ? $_SESSION['user'] : false;
+function isLogin(){
+    return isset($_SESSION['isLogin']);
 }
 
 function go($url, $message = ""){
@@ -46,3 +46,62 @@ function json_response($data = []){
     exit;
 }
 
+function checkEmpty(){
+    foreach($_POST as $input){
+        if(trim($input) == "" || $input == false) back("모든 정보를 입력해 주세요.");
+    }
+}
+
+function pager($page, $data){
+    define("LEN_PAGE", 5);
+    define("LEN_ARTICLE", 10);
+
+    $totalArticle = count($data);
+    $totalPage = ceil($totalArticle / LEN_ARTICLE);
+
+    $currentBlock = ceil($page / LEN_PAGE);
+    $start = $currentBlock * LEN_PAGE - LEN_PAGE + 1;
+    if($start < 1) {
+        $start = 1;
+    }
+
+    $end = $start + LEN_PAGE - 1;
+    if($end > $totalPage) {
+        $end = $totalPage;
+    }
+
+    $prevNo = $start - 1;
+    $nextNo = $end + 1;
+    $prev = $prevNo >= 1;
+    $next = $nextNo <= $totalPage;
+
+    $data = array_slice($data, ($page - 1) * LEN_ARTICLE, LEN_ARTICLE);
+
+    return (object)compact("data", "page", "start", "end", "prevNo", "nextNo", "prev", "next");
+}
+
+function filter_realfile(Array $files, String $dirname) : Array
+{   
+    $validFiles = [];
+    foreach($files as $file){
+        if(is_file($dirname.DS.$file)) $validFiles[] = $file;
+    }
+
+    return $validFiles;
+}
+
+function extname($filename){
+    return substr($filename, strrpos($filename, "."));
+}
+
+function upload_base64($dirname, $data, $filebase = null){
+    if($filebase == null) $filebase = time();
+
+    $split = explode(";base64,", $data);
+    $split2 = explode("/", $split[0]);
+    $content = base64_decode($split[1]);
+    $extname = "." . $split2[1];
+    $filename = $filebase . $extname;
+    file_put_contents($dirname.DS.$filename, $content);
+    return $filename;
+}

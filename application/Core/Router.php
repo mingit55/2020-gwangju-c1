@@ -13,7 +13,7 @@ class Router {
         $currentURL = explode("?", $_SERVER['REQUEST_URI'])[0];
         foreach(self::$pages as $page){
             if($page[0] === $currentURL) {
-                if(isset($page[2]) && $page[2] === "user" && !user()) back("로그인 후 이용하실 수 있습니다.");
+                if(isset($page[2]) && $page[2] === "user" && !isLogin()) back("로그인 후 이용하실 수 있습니다.");
                 $action = explode("@", $page[1]);
                 $conName = "Controller\\{$action[0]}";
                 $con = new $conName();

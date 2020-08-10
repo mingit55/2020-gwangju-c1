@@ -21,7 +21,7 @@ window.addEventListener("load", () => {
             visible = false;
         }, 1000);
 
-        fetch("/location.php")     
+        fetch("/location")     
         .then(res => res.text())
         .then(text => {
             if(visible){
@@ -30,5 +30,16 @@ window.addEventListener("load", () => {
                 clearTimeout(timeout);
             }
         });
+    });
+
+    $(".custom-file-input").on("change", e => {
+        let files = e.target.files;
+        if(files.length > 0) {
+            let text = files[0].name;
+            if(files.length > 1) text += " 외 " + (files.length - 1) + "개";
+            $(e.target).siblings(".custom-file-label").text(text);
+        } else {
+            $(e.target).siblings(".custom-file-label").text("파일을 업로드 하세요");
+        }
     });
 });

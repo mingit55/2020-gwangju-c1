@@ -55,18 +55,18 @@ hr {
  * 색상
  */ 
 
- .text-white-muted { color: #fffa; }
- .text-red { color: #F22E62; }
- .text-blue { color: #1B80BF; }
- .text-black { color: #333; }
- .text-muted { color: #777; }
+ .text-white-muted { color: #fffa!important; }
+ .text-red { color: #F22E62!important; }
+ .text-blue { color: #1B80BF!important; }
+ .text-black { color: #333!important; }
+ .text-muted { color: #777!important; }
 
- .bg-black { background-color: #222; }
+ .bg-black { background-color: #222!important; }
  .bg-dark { background-color: #353742!important; }
- .bg-red { background-color: #F22E62; }
- .bg-blue { background-color: #1B80BF; }
- .bg-gray { background-color: #f7f7f7; }
- .bg-none { background-color: transparent; background-image: none; }
+ .bg-red { background-color: #F22E62!important; }
+ .bg-blue { background-color: #1B80BF!important; }
+ .bg-gray { background-color: #f7f7f7!important; }
+ .bg-none { background-color: transparent!important; background-image: none!important; }
 
 /*
  * 접두사 접미사
@@ -131,6 +131,23 @@ hr {
         font-size: 2em;
     }   
 }
+
+/*
+ * 테이블
+ */
+.table-head, .table-row { display: flex; align-items: center; text-align: center; }
+.table-head { height: 50px; border-bottom: 2px solid #aaa; color: #888; font-size: 0.9em; }
+.table-row { min-height: 100px; padding: 1em 0; }
+.table-row:not(:last-child) { border-bottom: 1px solid #ddd; }
+
+.cell-60 { flex: 0 0 60%; max-width: 60%; }
+.cell-50 { flex: 0 0 50%; max-width: 50%; }
+.cell-40 { flex: 0 0 40%; max-width: 40%; }
+.cell-30 { flex: 0 0 30%; max-width: 30%; }
+.cell-25 { flex: 0 0 25%; max-width: 25%; }
+.cell-20 { flex: 0 0 20%; max-width: 20%; }
+.cell-15 { flex: 0 0 15%; max-width: 15%; }
+.cell-10 { flex: 0 0 10%; max-width: 10%; }
 
 /*
  * 데이터 리스트

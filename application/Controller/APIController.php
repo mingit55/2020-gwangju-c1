@@ -8,8 +8,14 @@ class APIController {
      * 행사정보 불러오기
      */
     function getFestivals(){
-        json_response(["festivals" => DB::fetchAll("SELECT * FROM xml_festivals")]);   
+        json_response(["festivals" => DB::fetchAll("SELECT * FROM festivals")]);   
     }
+    function getFestival(){
+        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $festival = DB::fetch("SELECT * FROM festivals WHERE sn = ?", [$id]);
+        json_response(compact("festival"));
+    }
+
     /**
 
      * 환율 정보 불러오기
@@ -55,7 +61,7 @@ class APIController {
     function insertDatabaseXML(){
         $xmlFile = "/resources/xml/festivalList.xml";
         $filePath = ROOT. str_replace("/", DS, $xmlFile);
-        DB::query("DELETE FROM xml_festivals");
+        DB::query("DELETE FROM festivals");
 
         $xml = simplexml_load_file($filePath);
         foreach($xml->items[0] as $item){
@@ -66,10 +72,11 @@ class APIController {
             $location = (string)$item->location;
             $dt = (string)$item->dt;
             $cn = (string)$item->cn;
-            $images = json_encode(((array)$item->images)["image"]);
-            $data = [$sn, $no, $nm, $area, $location, $dt, $cn, $images];
+            $images = ((array)$item->images)["image"];
+            $images = filter_realfile($images, FIMAGE . DS. str_pad($sn, 3, "0", STR_PAD_LEFT) . "_" . $no);
+            $data = [$sn, $no, $nm, $area, $location, $dt, $cn, json_encode($images)];
 
-            DB::query("INSERT INTO xml_festivals (sn, no, nm, area, location, dt, cn, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", $data);
+            DB::query("INSERT INTO festivals (sn, no, nm, area, location, dt, cn, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", $data);
             echo "\"{$nm}\" 업로드 완료<br>";
         }
     }

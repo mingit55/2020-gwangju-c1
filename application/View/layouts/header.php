@@ -12,6 +12,41 @@
     <script src="/resources/js/common.js"></script>
 </head>
 <body>
+    <!-- 로그인 폼 -->
+    <form id="sign-in" class="modal fade" action="/sign-in" method="post">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body py-4 px-3">
+                    <div class="title text-center">
+                        <h1>SIGN <strong>IN</strong></h1>
+                        <p>전북 축제 On! 다양한 서비스를 이용해 보세요!</p>
+                    </div>
+                    <div class="form-group mt-4">
+                        <input type="text" class="form-control" name="user_id" placeholder="아이디를 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" name="password" placeholder="비밀번호를 입력하세요">
+                    </div>
+                    <div class="form-group d-between fx-n2 text-muted px-1">
+                        <div class="d-flex align-items-center">
+                            <input type="checkbox" id="remember_id" name="remember_id">
+                            <label for="remember_id" class="ml-2 mb-1">아이디 저장 </label>
+                        </div>
+                        <a href="#">비밀번호 찾기</a>
+                    </div>
+                    <div class="form-group mt-3 d-flex">
+                        <div class="w-50 pr-1">
+                            <button class="btn--filled w-100 py-2">로그인</button>
+                        </div>
+                        <div class="w-50 pl-1">
+                            <button class="btn--bordered w-100 py-2">회원가입</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- /로그인 폼 -->
     <!-- 헤더 영역 -->
     <input type="checkbox" id="open__search" hidden>
     <input type="checkbox" id="open__nav" hidden>
@@ -28,7 +63,11 @@
                 <div class="header__other d-lg-flex d-none">
                     <!-- 유틸리티 -->
                     <nav class="header__utility">
-                        <a href="#">로그인</a>
+                        <?php if(isLogin()): ?>
+                            <a href="/logout">로그아웃</a>
+                        <?php else:?>
+                            <a href="#" data-toggle="modal" data-target="#sign-in">로그인</a>
+                        <?php endif;?>
                         <a href="#">회원가입</a>
                         <a href="#">전라북도청</a>
                     </nav>
@@ -55,7 +94,7 @@
                 <nav class="nav__menu d-lg-flex d-none">
                     <div class="menu__item"><a href="/">HOME</a></div>
                     <div class="menu__item"><a href="/major-festival">전북 대표 축제</a></div>
-                    <div class="menu__item"><a href="#">축제 정보</a></div>
+                    <div class="menu__item"><a href="/festivals">축제 정보</a></div>
                     <div class="menu__item"><a href="#">축제 일정</a></div>
                     <div class="menu__item"><a href="/exchange-guide">환율안내</a></div>
                     <div class="menu__item">
@@ -92,7 +131,11 @@
     </header>
     <aside class="aside--mobile">
         <div class="aside__other">
-            <a href="#" class="btn--filled mr-1">로그인</a>
+            <?php if(isLogin()):?>
+                <a href="/logout" class="btn--filled mr-1">로그아웃</a>
+            <?php else:?>
+                <a href="#" class="btn--filled mr-1" data-toggle="modal" data-target="#sign-in">로그인</a>
+            <?php endif;?>
             <a href="#" class="btn--bordered mr-3">회원가입</a>
             <a href="#" class="mr-1">전라북도청</a>
             <select>
@@ -104,7 +147,7 @@
         <nav class="aside__nav">
             <a href="/">HOME</a>
             <a href="/major-festival">전북 대표 축제</a>
-            <a href="#">축제 정보</a>
+            <a href="/festivals">축제 정보</a>
             <a href="#">축제 일정</a>
             <a href="/exchange-guide">환율안내</a>
             <a href="#">종합지원센터</a>
