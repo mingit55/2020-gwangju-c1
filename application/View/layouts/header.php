@@ -95,7 +95,7 @@
                     <div class="menu__item"><a href="/">HOME</a></div>
                     <div class="menu__item"><a href="/major-festival">전북 대표 축제</a></div>
                     <div class="menu__item"><a href="/festivals">축제 정보</a></div>
-                    <div class="menu__item"><a href="#">축제 일정</a></div>
+                    <div class="menu__item"><a href="/schedules">축제 일정</a></div>
                     <div class="menu__item"><a href="/exchange-guide">환율안내</a></div>
                     <div class="menu__item">
                         <a href="#">종합지원센터</a>
@@ -148,7 +148,7 @@
             <a href="/">HOME</a>
             <a href="/major-festival">전북 대표 축제</a>
             <a href="/festivals">축제 정보</a>
-            <a href="#">축제 일정</a>
+            <a href="/schedules">축제 일정</a>
             <a href="/exchange-guide">환율안내</a>
             <a href="#">종합지원센터</a>
             <div class="aside__subnav">

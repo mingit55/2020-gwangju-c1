@@ -14,6 +14,7 @@ Router::get("/festivals", "FestivalController@festivalPage");
 Router::get("/festivals/images-tar", "FestivalController@downloadImageTar");
 Router::get("/festivals/images-zip", "FestivalController@downloadImageZip");
 Router::get("/festivals/details", "FestivalController@detailPage");
+Router::get("/schedules", "FestivalController@schedulePage");
 
 /**
  * Action
@@ -35,6 +36,7 @@ Router::get("/api/festivals", "APIController@getFestivals");
 Router::get("/api/festival", "APIController@getFestival");
 Router::get("/api/exchanges", "APIController@getExchanges");
 
+Router::get("/openAPI/festivalList.php", "APIController@getFestivalsByMonth");
 Router::get("/xml/insert-database", "APIController@insertDatabaseXML");
 
 Router::connect();

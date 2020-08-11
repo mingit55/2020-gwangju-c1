@@ -15,6 +15,49 @@ class APIController {
         $festival = DB::fetch("SELECT * FROM festivals WHERE sn = ?", [$id]);
         json_response(compact("festival"));
     }
+    function getFestivalsByMonth(){
+        if(!isset($_GET['searchType']) || !isset($_GET['year'])) exit;
+
+        $summary = isset($_GET['summary']);
+        $searchType = $_GET['searchType'];
+        $year = $_GET['year'];
+        $month = isset($_GET['month']) ? $_GET['month'] : null;
+        $first_date = strtotime($year."-".$month."-1");
+
+        if(($searchType == "M" && $month === null) || !$first_date) exit;
+        
+        $next_month_first_date = strtotime("+1 Month", $first_date);
+        $last_date = strtotime("-1 Day", $next_month_first_date);
+
+        if($summary) {
+            json_response(["schedules" => DB::fetchAll("SELECT 
+                    nm, 
+                    IF(DATE(start_date) < DATE(?), 1, DATE_FORMAT(start_date, '%d')) start_date,
+                    IF(DATE(end_date) > DATE(?), ?, DATE_FORMAT(end_date, '%d')) end_date
+                FROM festivals 
+                WHERE (DATE(?) BETWEEN DATE(start_date) AND DATE(end_date))
+                OR (DATE(?) BETWEEN DATE(start_date) AND DATE(end_date))
+                OR (DATE(start_date) BETWEEN DATE(?) AND DATE(?))
+                OR (DATE(end_date) BETWEEN DATE(?) AND DATE(?))",
+                [
+                    date("Y-m-d", $first_date),
+                    date("Y-m-d", $last_date), date("d", $last_date),
+                    date("Y-m-d", $first_date), date("Y-m-d", $last_date),
+                    date("Y-m-d", $first_date), date("Y-m-d", $last_date),
+                    date("Y-m-d", $first_date), date("Y-m-d", $last_date)
+                ])
+            ]);
+        } else {
+            $items = DB::fetchAll("SELECT * 
+                                    FROM festivals 
+                                    WHERE (DATE(?) BETWEEN DATE(start_date) AND DATE(end_date))
+                                    OR (DATE(?) BETWEEN DATE(start_date) AND DATE(end_date))",[
+                                        date("Y-m-d", $first_date), date("Y-m-d", $last_date)
+                                    ]);
+            $totalCount = count($items);
+            json_response(compact("items", "totalCount", "year", "month", "searchType"));
+        }
+    }
 
     /**
 
@@ -70,13 +113,18 @@ class APIController {
             $nm = (string)$item->nm;
             $area = (string)$item->area;
             $location = (string)$item->location;
-            $dt = (string)$item->dt;
             $cn = (string)$item->cn;
             $images = ((array)$item->images)["image"];
-            $images = filter_realfile($images, FIMAGE . DS. str_pad($sn, 3, "0", STR_PAD_LEFT) . "_" . $no);
-            $data = [$sn, $no, $nm, $area, $location, $dt, $cn, json_encode($images)];
 
-            DB::query("INSERT INTO festivals (sn, no, nm, area, location, dt, cn, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", $data);
+            $split_date = explode("~", str_replace(".", "-", (string)$item->dt));
+            $start_date = date("Y-m-d", strtotime($split_date[0]));
+            $end_date = date("Y-m-d", strtotime(substr($start_date, 0, 4) . "-" . $split_date[1]));
+            $dt = $start_date . " ~ ". $end_date;
+
+            $images = filter_realfile($images, FIMAGE . DS. str_pad($sn, 3, "0", STR_PAD_LEFT) . "_" . $no);
+            $data = [$sn, $no, $nm, $area, $location, $cn, $dt, $start_date, $end_date, json_encode($images)];
+
+            DB::query("INSERT INTO festivals (sn, no, nm, area, location, cn, dt, start_date, end_date, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", $data);
             echo "\"{$nm}\" 업로드 완료<br>";
         }
     }

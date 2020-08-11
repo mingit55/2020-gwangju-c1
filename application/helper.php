@@ -42,7 +42,7 @@ function json_response($data = []){
     if(!is_array($data)) $data = ["message" => $data];
 
     header("Content-Type: application/json");
-    echo json_encode($data);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE);
     exit;
 }
 

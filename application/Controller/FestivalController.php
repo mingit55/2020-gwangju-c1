@@ -29,6 +29,27 @@ class FestivalController {
         view("festival-detail", compact("festival", "reviews"));
     }
 
+    function schedulePage(){
+        $year = isset($_GET['year']) ? $_GET['year'] : date("Y");
+        $month = isset($_GET['month']) ? $_GET['month'] : date("m");
+        $first_date = strtotime($year."-".$month."-1");
+        
+        $next_month_first_date = strtotime("+1 Month", $first_date);
+        $last_date = strtotime("-1 Day", $next_month_first_date);
+
+        $prev_month = strtotime("-1 Month", $first_date);
+        $next_month = strtotime("+1 Month", $first_date);
+
+        view("festival-schedule", [
+            "first_date" => $first_date,
+            "last_date" => $last_date,
+            "year" => $year,
+            "month" => $month,
+            "prev_month" => $prev_month,
+            "next_month" => $next_month
+        ]);
+    }
+
     /**
      * Action
      */
@@ -106,6 +127,10 @@ class FestivalController {
         // 양식 확인
         if(!preg_match("/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2} ~ [0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/", $dt))
             back("올바른 축제 기간을 입력해 주세요. (ex 2020-01-01 ~ 2020-01-20)");
+        
+        $split_dt = explode(" ~ ", $dt);
+        $start_date = $split_dt[0];
+        $end_date = $split_dt[1];
 
 
         // 이미지 파일명 저장 & 양식 확인
@@ -129,8 +154,8 @@ class FestivalController {
         
         // 데이터 삽입
         $no = substr((string)time(), -5);
-        DB::query("INSERT INTO festivals(no, nm, location, dt, images) VALUES (?, ?, ?, ?, ?)", [
-            $no, $nm, $location, $dt, json_encode($filenames)
+        DB::query("INSERT INTO festivals(no, nm, location, dt, start_date, end_date, images) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+            $no, $nm, $location, $dt, $start_date, $end_date, json_encode($filenames)
         ]);
         $sn = DB::lastInsertId();
         
@@ -150,6 +175,14 @@ class FestivalController {
         $festival = DB::fetch("SELECT * FROM festivals WHERE sn = ?", [$input->id]);
         if(!$festival) json_response("축제 정보가 존재하지 않습니다.");
 
+        // 양식 확인
+        if(!preg_match("/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2} ~ [0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/", $input->dt))
+            back("올바른 축제 기간을 입력해 주세요. (ex 2020-01-01 ~ 2020-01-20)");
+        
+        $split_dt = explode(" ~ ", $input->dt);
+        $start_date = $split_dt[0];
+        $end_date = $split_dt[1];
+
         // 기존 파일 삭제하기
         $dirname = FIMAGE.DS.str_pad($festival->sn, 3, "0", STR_PAD_LEFT)."_".$festival->no;
         $festival->images = json_decode($festival->images);
@@ -168,8 +201,8 @@ class FestivalController {
         }
         
         // DB에 저장하기
-        DB::query("UPDATE festivals SET nm = ?, dt = ?, location = ?, images = ? WHERE sn = ?", [
-            $input->nm, $input->dt, $input->location, json_encode(array_merge($input->left_images, $add_images)), $input->id
+        DB::query("UPDATE festivals SET nm = ?, dt = ?, location = ?, images = ?, start_date = ?, end_date = ? WHERE sn = ?", [
+            $input->nm, $input->dt, $input->location, json_encode(array_merge($input->left_images, $add_images)), $start_date, $end_date, $input->id
         ]);
 
         json_response(["result" => true, "message" => "수정되었습니다."]);
