@@ -11,17 +11,21 @@ class CalendarDay {
         this.$list = this.$elem.find(".schedule-list");
     }
 
-    addEvent(){
-        Array.from(arguments).forEach(eventName => {
-            let overlap = this.prevDay != null && this.prevDay.events.find(event => event.name == eventName);
-            this.events.push({name: eventName, display: !overlap});
+    setEvent(){
+        Array.from(arguments).forEach(event => {
+            let prevIdx = this.prevDay != null ? this.prevDay.events.findIndex(item => item && item.id == event.sn) : -1;
+            let eventObj = {id: event.sn, name: event.nm, display: prevIdx < 0};
+            if(prevIdx < 0) this.events.push(eventObj);
+            else this.events[prevIdx] = eventObj;
         });
         this.update();
     }
 
     getElement(){
+        let now = new Date();
+        let isNow = this.date && now.toDateString() == this.date.toDateString();
         if(this.date === null) return $(`<div class="schedule-item--empty"></div>`);
-        else return $(`<div class="schedule-item">
+        else return $(`<div class="schedule-item${isNow ? '--current' : ''}">
                             <span class="schedule-item__span">${this.date.getDate()}</span>
                             <ol class="schedule-list"></ol>
                         </div>`);
@@ -29,9 +33,14 @@ class CalendarDay {
 
     update(){
         this.$list.html("");
-        this.events.forEach(event => {
-            this.$list.append($(`<li class="schedule-list__li">${event.display ? event.name : ''}</li>`));
-        });
+        for(let i = 0; i < this.events.length; i++){
+            let event = this.events[i];
+            if(event){
+                this.$list.append($(`<li class="schedule-list__li" title="${event.name}" onclick="location.href='/festivals/details?id=${event.id}'">${event.display ? event.name : ''}</li>`));
+            } else {
+                this.$list.append($(`<li class="schedule-list__li--empty"></li>`));    
+            }
+        }
     }
 }
 
@@ -43,6 +52,7 @@ class Calendar {
     async init(){
         this.currentDate = this.getCurrentDate();
         this.schedules = await this.getSchedules();
+        console.log(this.currentDate, this.schedules);
 
         this.$body = $("#schedule .schedule-body");
         this.days = [];
@@ -75,8 +85,8 @@ class Calendar {
 
             let events = this.schedules
                 .filter(schedule => schedule.start_date <= i && i <= schedule.end_date)
-                .map(schedule => schedule.nm);
-            day.addEvent(...events);
+                .map(schedule => schedule);
+            day.setEvent(...events);
 
             this.days.push(day);
             this.$body.append(day.$elem);
@@ -90,7 +100,7 @@ class Calendar {
     getSchedules(){
         return fetch(`/openAPI/festivalList.php?searchType=M&summary=true&year=${this.currentYear}&month=${(this.currentMonth + 1)}`)
             .then(res => res.json())
-            .then(res => res.schedules);
+            .then(res => res.schedules.sort((a, b) => a.start_date - b.start_date));
     }
 
     getCurrentDate(){
@@ -102,7 +112,7 @@ class Calendar {
         }, {});
         
         let year = !query.year ? new Date().getFullYear() : query.year;
-        let month = !query.month ? new Date().getMonth() : query.month;
+        let month = !query.month ? new Date().getMonth() : query.month - 1;
         try {
             return new Date(year, month, 1);
         } catch {

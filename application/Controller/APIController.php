@@ -19,19 +19,30 @@ class APIController {
         if(!isset($_GET['searchType']) || !isset($_GET['year'])) exit;
 
         $summary = isset($_GET['summary']);
-        $searchType = $_GET['searchType'];
+        $searchType = strtolower($_GET['searchType']);
         $year = $_GET['year'];
-        $month = isset($_GET['month']) ? $_GET['month'] : null;
-        $first_date = strtotime($year."-".$month."-1");
 
-        if(($searchType == "M" && $month === null) || !$first_date) exit;
-        
-        $next_month_first_date = strtotime("+1 Month", $first_date);
-        $last_date = strtotime("-1 Day", $next_month_first_date);
+
+        if($searchType == "y") {
+            $month = null;
+            $first_date = strtotime("$year-01-01");
+            $next_year_first_date = strtotime(($year + 1) . "-01-01");
+            $last_date = strtotime("-1 Day", $next_year_first_date);
+
+        } else if($searchType == "m"){
+            $month = isset($_GET['month']) ? $_GET['month'] : null;
+            $first_date = strtotime($year."-".$month."-1");
+    
+            if(!$first_date) exit;
+            
+            $next_month_first_date = strtotime("+1 Month", $first_date);
+            $last_date = strtotime("-1 Day", $next_month_first_date);
+        }
+
 
         if($summary) {
             json_response(["schedules" => DB::fetchAll("SELECT 
-                    nm, 
+                    sn, nm, 
                     IF(DATE(start_date) < DATE(?), 1, DATE_FORMAT(start_date, '%d')) start_date,
                     IF(DATE(end_date) > DATE(?), ?, DATE_FORMAT(end_date, '%d')) end_date
                 FROM festivals 
@@ -48,19 +59,28 @@ class APIController {
                 ])
             ]);
         } else {
-            $items = DB::fetchAll("SELECT * 
+            $items = DB::fetchAll("SELECT sn, no, nm, location, dt, cn, images 
                                     FROM festivals 
                                     WHERE (DATE(?) BETWEEN DATE(start_date) AND DATE(end_date))
-                                    OR (DATE(?) BETWEEN DATE(start_date) AND DATE(end_date))",[
+                                    OR (DATE(?) BETWEEN DATE(start_date) AND DATE(end_date))
+                                    OR (DATE(start_date) BETWEEN DATE(?) AND DATE(?))
+                                    OR (DATE(end_date) BETWEEN DATE(?) AND DATE(?))",[
+                                        date("Y-m-d", $first_date), date("Y-m-d", $last_date),
+                                        date("Y-m-d", $first_date), date("Y-m-d", $last_date),
                                         date("Y-m-d", $first_date), date("Y-m-d", $last_date)
                                     ]);
+            $items = array_map(function($festival){
+                $festival->images = array_map(function($image){
+                    return (object)['image' => $image];
+                }, json_decode($festival->images));
+                return $festival;
+            }, $items);
             $totalCount = count($items);
             json_response(compact("items", "totalCount", "year", "month", "searchType"));
         }
     }
 
     /**
-
      * 환율 정보 불러오기
      */
 

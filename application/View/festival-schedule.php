@@ -20,14 +20,14 @@
             <button class="btn--bordered" onclick="location.href='/schedules?year=<?=date('Y')?>&month=<?=date('m')?>'">이번 달</button>
             <div class="schedule-center">
                 <a class="schedule-header__a" href="/schedules?year=<?=date("Y", $prev_month)?>&month=<?=date("m", $prev_month)?>">
-                    <i class="fa fa-angle-left"></i>
+                    이전달
                 </a>
                 <strong class="schedule-title"><?=$year?>년 <?=$month?>월</strong>
                 <a class="schedule-header__a" href="/schedules?year=<?=date("Y", $next_month)?>&month=<?=date("m", $next_month)?>">
-                    <i class="fa fa-angle-right"></i>
+                    다음달
                 </a>
             </div>
-            <button class="btn--filled">축제관리</button>
+            <button class="btn--filled" onclick="location.href='/festivals'">축제관리</button>
         </div>  
         <div class="schedule-body"></div>
     </div>
